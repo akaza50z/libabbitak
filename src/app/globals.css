@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #f5f0e8;
   --foreground: #171717;
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,14 +16,85 @@
   }
 }
 
+/* Mobile-first: prevent horizontal scroll, support notched phones */
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  width: 100%;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100dvh;
+  width: 100%;
+  position: relative;
+}
+
+/* Ensure inputs always have visible dark text on white background */
+input,
+textarea,
+select {
+  color: #171717;
+  background-color: #ffffff;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Prevent input content from causing overflow */
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+textarea {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Hide scrollbar but allow scroll (category nav) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Better touch responsiveness on mobile */
+@media (hover: none) {
+  button, a, [role="button"] {
+    touch-action: manipulation;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+}
+
+/* Admin mobile-first: force containment */
+.admin-mobile-root,
+.admin-mobile-root * {
+  box-sizing: border-box;
+}
+
+.admin-mobile-root input,
+.admin-mobile-root textarea,
+.admin-mobile-root select {
+  width: 100% !important;
+  max-width: 100% !important;
 }

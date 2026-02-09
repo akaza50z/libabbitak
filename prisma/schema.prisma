@@ -1,0 +1,64 @@
+// Prisma schema - SQLite for dev, compatible with MySQL
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model RestaurantSettings {
+  id             String   @id @default(cuid())
+  restaurantName String   @default("المتجر")
+  address        String?  @default("")
+  mapUrl         String?  @default("") // exact Google Maps link
+  phone          String?  @default("")
+  whatsapp       String?  @default("")
+  facebookUrl    String?  @default("")
+  instagramUrl   String?  @default("")
+  wifiPassword   String?  @default("")
+  currency       String   @default("IQD")
+  logoUrl        String?  @default("")
+  mode           String   @default("dine-in") // "dine-in" | "delivery"
+  isOpen         Boolean  @default(true)
+  extraInfo      String?  @default("") // description, service info
+  messageFooter  String?  @default("شكراً لزيارتكم")
+  updatedAt      DateTime @updatedAt
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Category {
+  id         String     @id @default(cuid())
+  name_ar    String
+  parentId   String?    // null = top-level, else sub-category
+  imageUrl   String?    @default("")
+  sortOrder  Int        @default(0)
+  isActive   Boolean    @default(true)
+  items      Item[]
+  parent     Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: Cascade)
+  children   Category[] @relation("CategoryToCategory")
+  createdAt  DateTime   @updatedAt
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name_ar     String
+  desc_ar     String?  @default("")
+  priceInt    Int      // price in smallest unit (IQD)
+  oldPriceInt Int?     // for strikethrough discount display
+  imagePath   String?  @default("")
+  imageUrl    String?  @default("")
+  isAvailable Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @updatedAt
+  updatedAt   DateTime @updatedAt
+}

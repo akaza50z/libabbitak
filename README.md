@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# QR Menu + WhatsApp Checkout
 
-## Getting Started
+A production-ready **QR Menu** web app for restaurants. Customers browse the menu, add items to cart, then checkout via WhatsApp or call the restaurant. No online payments. Mobile-first, Arabic RTL.
 
-First, run the development server:
+## Features
+
+- **Public Menu** (`/ar`): Category tabs, search, item cards, cart, WhatsApp checkout, call button
+- **Admin Panel** (`/admin`): Restaurant settings, categories CRUD, items CRUD, image upload
+- **Auth**: Simple password login with bcrypt. First-run setup at `/admin/setup`
+- **Cart**: Stored in localStorage, survives refresh
+- **WhatsApp**: Pre-filled order message with items, totals, table/address, notes
+
+## Tech Stack
+
+- Next.js 14 App Router (TypeScript)
+- Tailwind CSS
+- Prisma ORM + SQLite (dev). MySQL-compatible schema for Hostinger
+- Zod validation, bcrypt auth
+
+## Quick Start
 
 ```bash
+npm install
+npx prisma migrate dev
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Public menu**: http://localhost:3000/ar
+- **Admin**: http://localhost:3000/admin (first time: use `/admin/setup`)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Seed (optional)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Creates sample data + admin user (username: `admin`, password: `admin123`):
 
-## Learn More
+```bash
+npm run db:seed
+```
 
-To learn more about Next.js, take a look at the following resources:
+Or run after migrate:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx prisma db seed
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Build
 
-## Deploy on Vercel
+```bash
+npm run build
+npm start
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Hostinger Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Node.js hosting**: Use Hostinger Node.js plan.
+2. **Environment variables** (in Hostinger panel):
+   - `DATABASE_URL` – For SQLite: `file:./prisma/prod.db`. For MySQL: `mysql://user:pass@host/db`
+   - `SESSION_SECRET` – Long random string for session cookies
+
+3. **Database**:
+   - SQLite: ensure `prisma` folder and `prod.db` are writable.
+   - MySQL: run `npx prisma migrate deploy` after setting `DATABASE_URL`.
+
+4. **Uploads**: Create `public/uploads` with write permissions (755 or 775).
+
+5. **Build & start**:
+   ```bash
+   npm install
+   npx prisma generate
+   npx prisma migrate deploy   # if using migrations
+   npm run build
+   npm start
+   ```
+
+## Customize for a Restaurant
+
+1. **First run**: Visit `/admin/setup` to create admin password.
+2. **Settings**: Set restaurant name, phone, WhatsApp number, currency (IQD), logo, mode (dine-in/delivery).
+3. **Categories**: Add menu sections (e.g. مقبلات، أطباق رئيسية).
+4. **Items**: Add dishes with name, description, price, image (upload or URL).
+5. **QR link**: Use your site URL (e.g. `https://yoursite.com/ar`) – generate a QR code from this URL.
+
+## Create QR Link
+
+- **URL**: `https://your-domain.com/ar`
+- Use any free QR generator (e.g. qr-code-generator.com) with this URL.
+- Print and place on tables or at the counter.
+
+## Checklist
+
+- [ ] Run `npm install`
+- [ ] Run `npx prisma migrate dev`
+- [ ] Run `npm run db:seed` (optional)
+- [ ] Visit `/admin/setup` and create admin user
+- [ ] Configure restaurant settings
+- [ ] Add categories and items
+- [ ] Test WhatsApp and call buttons
+- [ ] Generate QR code for `/ar`
