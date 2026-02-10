@@ -154,12 +154,12 @@ async function main() {
         Groceries: "غذائیات",
         "Detergents & Health": "منظفات و صحة",
       };
-      function parsePrice(priceStr: string): number {
+      const parsePrice = (priceStr: string): number => {
         if (!priceStr || priceStr.trim() === "IQD") return 0;
         const match = priceStr.replace(/,/g, "").match(/(\d+)/);
         return match ? parseInt(match[1], 10) : 0;
-      }
-      function parseCSVRow(line: string): string[] {
+      };
+      const parseCSVRow = (line: string): string[] => {
         const result: string[] = [];
         let current = "";
         let inQuotes = false;
@@ -173,7 +173,7 @@ async function main() {
         }
         result.push(current.trim());
         return result;
-      }
+      };
       const items = await prisma.item.findMany({ include: { category: true } });
       const byNameAndCat = new Map<string, { id: string }>();
       for (const item of items) {
