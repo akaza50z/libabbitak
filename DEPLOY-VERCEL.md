@@ -56,8 +56,13 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 2. Vercel will run:
    - `prisma generate` (via postinstall)
    - `prisma db push` (creates/updates tables)
-   - `prisma db seed` (loads products, settings, admin)
+   - `prisma db seed` (loads products with images+prices from CSV on first run)
    - `next build`
+
+3. **Existing production DB with missing images?** Run once locally with production `DATABASE_URL`:
+   ```bash
+   npm run db:apply-csv
+   ```
 3. If MySQL connection fails, double‑check Remote MySQL in Hostinger and `DATABASE_URL` in Vercel
 
 ## 6. After Deploy
@@ -74,3 +79,4 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | `prisma generate` failed | Check Prisma is in `dependencies` (not devDependencies) |
 | Build timeout | Hostinger MySQL might be slow; try again or check DB host |
 | Admin upload 500 | Add Blob storage in Vercel Storage tab |
+| Products missing images | Run `npm run db:apply-csv` once (set DATABASE_URL to production) |

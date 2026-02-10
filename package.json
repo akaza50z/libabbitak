@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "db:seed": "npx tsx prisma/seed.ts",
+    "db:apply-csv": "npx tsx prisma/update-from-csv.ts",
     "db:update-images": "npx tsx prisma/update-category-images.ts"
   },
   "dependencies": {

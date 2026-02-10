@@ -107,6 +107,7 @@ async function main() {
 
   // Import products from JSON
   const jsonPath = path.join(__dirname, "data", "all_products.json");
+  let didImport = false;
   if (!fs.existsSync(jsonPath)) {
     console.warn("all_products.json not found at prisma/data/all_products.json, skipping product import");
   } else {
@@ -138,6 +139,67 @@ async function main() {
         });
       }
       console.log(`Imported ${sortOrder} products from all_products.json`);
+      didImport = true;
+    }
+  }
+
+  // Apply CSV images and prices only when we just imported (never overwrite admin edits)
+  if (didImport) {
+    const csvPath = path.join(__dirname, "data", "lbab_beytk_products_final.csv");
+    if (fs.existsSync(csvPath)) {
+      const CSV_CATEGORY_TO_ARABIC: Record<string, string> = {
+        Fruits: "فواكه",
+        Vegetables: "خضروات",
+        "Leafy Greens": "ورقيات",
+        Groceries: "غذائیات",
+        "Detergents & Health": "منظفات و صحة",
+      };
+      function parsePrice(priceStr: string): number {
+        if (!priceStr || priceStr.trim() === "IQD") return 0;
+        const match = priceStr.replace(/,/g, "").match(/(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+      }
+      function parseCSVRow(line: string): string[] {
+        const result: string[] = [];
+        let current = "";
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const c = line[i];
+          if (c === '"') inQuotes = !inQuotes;
+          else if (c === "," && !inQuotes) {
+            result.push(current.trim());
+            current = "";
+          } else if (c !== "\r" && c !== "\n") current += c;
+        }
+        result.push(current.trim());
+        return result;
+      }
+      const items = await prisma.item.findMany({ include: { category: true } });
+      const byNameAndCat = new Map<string, { id: string }>();
+      for (const item of items) {
+        byNameAndCat.set(`${item.name_ar}|${item.category.name_ar}`, { id: item.id });
+      }
+      const raw = fs.readFileSync(csvPath, "utf-8");
+      const lines = raw.split(/\r?\n/).filter((l) => l.trim());
+      let updated = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const cols = parseCSVRow(lines[i]);
+        if (cols.length < 5) continue;
+        const [category, name, , price, imageUrl] = cols;
+        const categoryAr = CSV_CATEGORY_TO_ARABIC[category];
+        if (!categoryAr) continue;
+        const key = `${name}|${categoryAr}`;
+        const item = byNameAndCat.get(key);
+        if (!item) continue;
+        const priceInt = parsePrice(price);
+        const img = imageUrl && imageUrl.startsWith("http") ? imageUrl : null;
+        await prisma.item.update({
+          where: { id: item.id },
+          data: { imageUrl: img ?? undefined, priceInt },
+        });
+        updated++;
+      }
+      console.log(`Updated ${updated} products with images and prices from CSV`);
     }
   }
 

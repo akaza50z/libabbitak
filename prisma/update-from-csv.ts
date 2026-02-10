@@ -43,9 +43,8 @@ function parseCSVRow(line: string): string[] {
 
 async function main() {
   const candidates = [
-    path.join(process.cwd(), "lbab_beytk_products_final.csv"),
     path.join(process.cwd(), "prisma", "data", "lbab_beytk_products_final.csv"),
-    path.join(process.cwd(), "..", "lbab_beytk_products_final.csv"),
+    path.join(process.cwd(), "lbab_beytk_products_final.csv"),
   ];
   const csvPath = candidates.find((p) => fs.existsSync(p));
   if (!csvPath) {
