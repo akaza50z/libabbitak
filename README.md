@@ -5,7 +5,7 @@ A production-ready **QR Menu** web app for restaurants. Customers browse the men
 ## Features
 
 - **Public Menu** (`/ar`): Category tabs, search, item cards, cart, WhatsApp checkout, call button
-- **Admin Panel** (`/admin`): Restaurant settings, categories CRUD, items CRUD, image upload
+- **Admin Panel** (`/admin`): Restaurant settings, categories CRUD, items CRUD, image upload (Vercel Blob)
 - **Auth**: Simple password login with bcrypt. First-run setup at `/admin/setup`
 - **Cart**: Stored in localStorage, survives refresh
 - **WhatsApp**: Pre-filled order message with items, totals, table/address, notes
