@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    unoptimized: true, // Allows user-uploaded and arbitrary image URLs
+    unoptimized: true,
+    remotePatterns: [
+      { protocol: "https", hostname: "**.blob.vercel-storage.com", pathname: "/**" },
+      { protocol: "https", hostname: "dyj6gt4964deb.cloudfront.net", pathname: "/**" },
+    ],
   },
 };
 

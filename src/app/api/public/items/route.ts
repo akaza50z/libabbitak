@@ -30,7 +30,9 @@ export async function GET(request: NextRequest) {
       orderBy: [{ category: { sortOrder: "asc" } }, { sortOrder: "asc" }],
       include: { category: { select: { name_ar: true, id: true } } },
     });
-    return NextResponse.json(items);
+    return NextResponse.json(items, {
+      headers: { "Cache-Control": "no-store, max-age=0" },
+    });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
