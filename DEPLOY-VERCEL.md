@@ -26,7 +26,16 @@
 4. Import your `libabbitak` repository
 5. Before deploying, add Environment Variables (see below)
 
-## 3. Environment Variables (Vercel)
+## 3. Add Blob Storage (for image uploads)
+
+1. In your Vercel project, go to the **Storage** tab
+2. Click **Connect Database** → **Create New** → **Blob**
+3. Name it (e.g. "libabbitak-images") and create
+4. `BLOB_READ_WRITE_TOKEN` is auto-added to env vars
+
+Without this, admin image uploads will return 500.
+
+## 4. Environment Variables (Vercel)
 
 In **Project Settings** → **Environment Variables**, add:
 
@@ -34,13 +43,14 @@ In **Project Settings** → **Environment Variables**, add:
 |------|-------|-------------|
 | `DATABASE_URL` | `mysql://u389308396_u1234_dbuser:YOUR_PASSWORD@srv1700.hstgr.io:3306/u389308396_libabbitak_db` | Production, Preview |
 | `SESSION_SECRET` | Long random string (e.g. 32+ chars) | Production, Preview |
+| `BLOB_READ_WRITE_TOKEN` | Auto-set when you add Blob storage (see above) | Production, Preview |
 
 Generate a strong `SESSION_SECRET`:
 ```bash
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-## 4. Deploy
+## 5. Deploy
 
 1. Click **Deploy**
 2. Vercel will run:
@@ -50,7 +60,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
    - `next build`
 3. If MySQL connection fails, double‑check Remote MySQL in Hostinger and `DATABASE_URL` in Vercel
 
-## 5. After Deploy
+## 6. After Deploy
 
 - **Customer menu:** `https://your-app.vercel.app/ar`
 - **Admin:** `https://your-app.vercel.app/admin`
@@ -63,3 +73,4 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | Can't reach database server | Enable Remote MySQL “any host” in Hostinger |
 | `prisma generate` failed | Check Prisma is in `dependencies` (not devDependencies) |
 | Build timeout | Hostinger MySQL might be slow; try again or check DB host |
+| Admin upload 500 | Add Blob storage in Vercel Storage tab |
